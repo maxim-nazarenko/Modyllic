@@ -7,7 +7,7 @@ PACKAGEXML := package.xml
 
 default:
 
-.PHONY: test test-verbose install uninstall clean build-package-xml discover-channel
+.PHONY: test test-verbose install uninstall clean build-package-xml discover-channel contributor-configuration
 
 clean:
 	rm -rf $(PACKAGEXML) tmp coverage
@@ -28,16 +28,20 @@ install-build-prereqs: discover-olb-channel
 # doing the reasonable thing and installing the *most stable* version
 # available.
 	pear list -c PEAR | grep -q '^XML_Serializer ' || pear install --alldeps PEAR/XML_Serializer || pear install --alldeps PEAR/XML_Serializer-beta
-	pear list -c PEAR | grep -q '^PEAR_PackageFileManager2 ' || pear install --alldeps PEAR/PEAR_PackageFileManager2
+	pear list -c PEAR | grep -q '^PEAR_PackageFileManager2 ' || pear install --alldeps PEAR/PEAR_PackageFileManager_Plugins-1.0.2 PEAR/PEAR_PackageFileManager2-1.0.2
 	pear list -c OnlineBuddies | grep -q '^PEAR_PackageFileManager_Gitrepoonly ' || pear install OnlineBuddies/PEAR_PackageFileManager_Gitrepoonly
 
-install-dist-prereqs: install-build-prereqs
+contributor-configuration: install-build-prereqs
 	if [ $$(git remote | grep -c '^upstream-testlib$$') -ne 1 ]; then git remote add upstream-testlib git://github.com/shiflett/testmore.git; fi
 	if [ $$(git remote | grep -c '^upstream$$') -ne 1 ]; then git remote add upstream git@github.com:OnlineBuddies/Modyllic.git; fi
 	if [ $$(git remote | grep -c '^upstream-wiki$$') -ne 1 ]; then git remote add upstream-wiki git@github.com:OnlineBuddies/Modyllic.wiki.git; fi
 	if [ $$(git branch | grep -c '^  upstream-wiki$$') -ne 1 ]; then ( git fetch upstream-wiki ; git branch upstream-wiki upstream-wiki/master ); fi
 	if [ $$(git remote | grep -c '^upstream-pear$$') -ne 1 ]; then git remote add upstream-pear git@github.com:OnlineBuddies/pear.git; fi
 	if [ $$(git branch | grep -c '^  upstream-pear$$') -ne 1 ]; then ( git fetch upstream-pear ; git branch upstream-pear upstream-pear/gh-pages ); fi
+	pear channel-info pirum >/dev/null || pear channel-discover pear.pirum-project.org
+	pear list -c pirum | grep -q '^Pirum ' || pear install pirum/Pirum-beta
+
+install-dist-prereqs: install-build-prereqs
 	pear channel-info pirum >/dev/null || pear channel-discover pear.pirum-project.org
 	pear list -c pirum | grep -q '^Pirum ' || pear install pirum/Pirum-beta
 
