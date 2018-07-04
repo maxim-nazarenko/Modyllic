@@ -56,7 +56,7 @@ could think of it as running `modyllic diff -d MySQL DSN SCHEMA` and
 applying the diff to the live database.
 
 ### `modyllic diff SCHEMA1 SCHEMA2`
-Produce the ALTER statements etc. that would make SCHEMA1 look like SCHEMA2. 
+Produce the ALTER statements etc. that would make SCHEMA1 look like SCHEMA2.
 This is smarter than running "diff" on two SQL dumps, because it actually
 parses SQL, ignores some things that should be ignored, and is sensitive to
 the semantic context.  This essentially shows you what "migrate" would do
@@ -133,7 +133,7 @@ SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 ````
 
 ### `modyllic dump SCHEMA`
-Produces the CREATE, INSERT, etc. commands to create SCHEMA from scratch. 
+Produces the CREATE, INSERT, etc. commands to create SCHEMA from scratch.
 This is Modyllic's replacement for `mysqldump
 -d` which gives you the output choice of several SQL dialects from the
 very concise to its own metadata-rich format.  You could also think of
@@ -250,3 +250,15 @@ colorized, syntax-highlighted version on STDOUT.
 `modyllic preparse FILENAME.sql > FILENAME.sqlc` - Can be used to optimize the
 performance of other tools by "pre-compiling" their input.  The other tools
 will load a `.sqlc` file in preference to a `.sql` if it is newer.
+
+## Docker
+
+Build
+```shell
+$ docker build -t modyllic .
+```
+
+and run
+```shell
+$ docker run --rm -it -v from/folder/path:/from_db:ro -v to/folder/path:/to_db:ro modyllic diff --from=/from_db --to=/to_db > result_file.sql
+```
